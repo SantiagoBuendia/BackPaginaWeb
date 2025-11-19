@@ -103,6 +103,7 @@ int main() {
     }
     else if (accion == "listarGrupos") {
         gestorGrupos.listarGrupos();
+        return 0;
     }
     else if (accion == "asignarEstudianteGrupo") {
         std::string idGrupo = formulario("grupo_id");
@@ -112,6 +113,7 @@ int main() {
     else if (accion == "listarGruposProfesor") {
         std::string idProfesor = formulario("id");
         gestorGrupos.listarGruposProfesor(idProfesor);
+        return 0;
     }
     else if (accion == "crearExamen") {
         std::string titulo = formulario("titulo");
@@ -121,6 +123,7 @@ int main() {
         std::string intentosPermitidos = formulario("intentos_permitidos");
         std::string idProfesor = formulario("profesor_id");
         gestorExamenes.registrarExamen(titulo, descripcion, idGrupo, instrucciones, intentosPermitidos, idProfesor);
+		return 0;
     }
     else if (accion == "agregarPregunta") {
         std::string idExamen = formulario("examen_id");
@@ -128,11 +131,12 @@ int main() {
         std::string puntos = formulario("puntos");
         std::string explicacion = formulario("explicacion");
         gestorExamenes.registrarPregunta(idExamen, pregunta, puntos, explicacion);
+        return 0;
     }
     else if (accion == "agregarOpciones") {
         gestorExamenes.registrarOpciones(formulario);
+        return 0;
     }
-    // Nuevas acciones para Intentos y Calificaciones, por ejemplo:
     else if (accion == "iniciarIntentoExamen") {
         std::string idExamen = formulario("examen_id");
         std::string idEstudiante = formulario("estudiante_id");
@@ -174,10 +178,27 @@ int main() {
         std::string comentarios = formulario("comentarios_calificacion");
         gestorCalificaciones.registrarCalificacionFinal(idExamen, idEstudiante, mejorIntentoId, calificacionFinal, puntosObtenidos, puntosTotales, porcentaje, comentarios);
         std::cout << "Content-type: text/plain\r\n\r\nCalificación final registrada.";
+    }else if(accion== "listarExamenesPorProfesor"){
+        std::string idProfesor = formulario("idProfesor");
+        gestorExamenes.listarExamenesPorProfesor(idProfesor);
+	} else if (accion == "eliminarExamen") {
+        std::string idExamen = formulario("examen_id");
+        gestorExamenes.eliminarExamen(idExamen);
+	} else if (accion == "mostrarExamen") {
+        std::string idExamen = formulario("examen_id");
+        gestorExamenes.mostrarExamen(idExamen);
+	} else if (accion == "editarExamen") {
+        // Obtenemos el ID directamente del objeto 'formulario'
+        std::string id = formulario("id");
+        gestorExamenes.formularioEditarExamen(id);
+    } else if (accion == "guardarEdicion") {
+        // Pasamos el objeto 'formulario' (que es de tipo Cgicc)
+        gestorExamenes.guardarCambiosExamen(formulario);
     }
     else {
         std::cout << "Content-type: text/html\r\n\r\n";
         std::cout << "<html><body><h2>Acción no reconocida.</h2></body></html>";
+        return 0;
     }
 
     return 0;

@@ -47,32 +47,68 @@ void GestorGrupos::registrarEstudianteEnGrupo(const std::string& idGrupo, const 
     }
 }
 
-void GestorGrupos::listarGrupos() {
-    std::string query = "SELECT id, nombre FROM grupos";
-    MYSQL_RES* resultado;
-    MYSQL_ROW fila;
-
-    std::cout << "Content-type: application/json\r\n\r\n";
-
-    if (mysql_query(conexionDB, query.c_str()) == 0) {
-        resultado = mysql_store_result(conexionDB);
-        std::cout << "[";
-        bool primero = true;
-        while ((fila = mysql_fetch_row(resultado))) {
-            if (!primero) std::cout << ",";
-            std::cout << "{";
-            std::cout << "\"id\":" << fila[0] << ",";
-            std::cout << "\"nombre\":\"" << fila[1] << "\"";
-            std::cout << "}";
-            primero = false;
+static std::string escape_json(const std::string& s) {
+    std::string out;
+    out.reserve(s.size());
+    for (unsigned char c : s) {
+        switch (c) {
+        case '"': out += "\\\""; break;
+        case '\\': out += "\\\\"; break;
+        case '\b': out += "\\b"; break;
+        case '\f': out += "\\f"; break;
+        case '\n': out += "\\n"; break;
+        case '\r': out += "\\r"; break;
+        case '\t': out += "\\t"; break;
+        default:
+            if (c < 0x20) {
+                char buf[7];
+                std::snprintf(buf, sizeof(buf), "\\u%04x", c);
+                out += buf;
+            }
+            else {
+                out += c;
+            }
         }
-        std::cout << "]";
-        mysql_free_result(resultado);
     }
-    else {
-        std::cerr << "Error en la consulta listarGrupos: " << mysql_error(conexionDB) << std::endl;
+    return out;
+}
+
+void GestorGrupos::listarGrupos() {
+    const std::string query = "SELECT id, nombre FROM grupos";
+    MYSQL_RES* resultado = nullptr;
+    MYSQL_ROW fila = nullptr;
+
+    // Cabecera JSON (una sola vez)
+    std::cout << "Content-Type: application/json\r\n\r\n";
+
+    if (mysql_query(conexionDB, query.c_str()) != 0) {
+        std::cerr << "Error en listarGrupos SQL: " << mysql_error(conexionDB) << std::endl;
         std::cout << "[]";
+        return;
     }
+
+    resultado = mysql_store_result(conexionDB);
+    if (!resultado) {
+        std::cout << "[]";
+        return;
+    }
+
+    bool primero = true;
+    std::cout << "[";
+    while ((fila = mysql_fetch_row(resultado)) != nullptr) {
+        if (!primero) std::cout << ",";
+        const char* colId = fila[0];
+        const char* colNombre = fila[1];
+        std::string id = colId ? colId : "0";
+        std::string nombre = colNombre ? colNombre : "";
+        std::cout << "{\"id\":" << id << ",\"nombre\":\"" << escape_json(nombre) << "\"}";
+        primero = false;
+    }
+    std::cout << "]";
+    mysql_free_result(resultado);
+
+    // Evitar cualquier salida adicional del dispatcher
+    return;
 }
 
 void GestorGrupos::listarGruposProfesor(const std::string& idProfesor) {

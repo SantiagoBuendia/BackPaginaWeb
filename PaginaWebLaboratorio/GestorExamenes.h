@@ -18,6 +18,16 @@ public:
     void registrarPregunta(const std::string& idExamen, const std::string& pregunta, const std::string& puntos,
         const std::string& explicacion);
     void registrarOpciones(const cgicc::Cgicc& formulario);
+
+	void listarExamenesPorProfesor(const std::string& idProfesor);
+
+	void eliminarExamen(const std::string& idExamen);
+
+    void mostrarExamen(const std::string& idExamen);
+
+    void formularioEditarExamen(const std::string& idExamen);
+
+    void guardarCambiosExamen(const cgicc::Cgicc& formData);
 };
 
 #endif // GESTOR_EXAMENES_H
