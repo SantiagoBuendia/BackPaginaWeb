@@ -4,22 +4,22 @@
 #include <mysql.h>
 #include <string>
 #include <cgicc/Cgicc.h>
-#include "GestorAuditoria.h" // Se usa GestorAuditoria
-#include "Utilidades.h"      // Se usa Utilidades::generarToken
+#include "GestorAuditoria.h"
+#include "Utilidades.h"
 
 class GestorUsuarios {
 private:
-    MYSQL* conexionDB;
-    GestorAuditoria& gestorAuditoria; // Referencia para registrar auditorías
+	MYSQL* conexionDB;
+	GestorAuditoria& gestorAuditoria;
 
 public:
-    GestorUsuarios(MYSQL* conexion, GestorAuditoria& gestorAud);
+	GestorUsuarios(MYSQL* conexion, GestorAuditoria& gestorAud);
 
-    void verificarUsuario(const std::string& correo, const std::string& contrasena);
-    void registrarUsuario(const std::string& correo, const std::string& contrasena, const std::string& nombre, const std::string& rol, const std::string& idUsuarioAuditor);
-    void listarUsuarios();
-    void actualizarUsuario(const std::string& id, const std::string& nuevoNombre, const std::string& nuevaContrasena, const std::string& idUsuarioAuditor);
-    void eliminarUsuario(const std::string& id, const std::string& idUsuarioAuditor);
+	void verificarUsuario(const std::string& correo, const std::string& contrasena);
+	void registrarUsuario(const std::string& correo, const std::string& contrasena, const std::string& nombre, const std::string& rol, const std::string& idUsuarioAuditor);
+	void listarUsuarios();
+	void actualizarUsuario(const std::string& id, const std::string& nuevoNombre, const std::string& nuevaContrasena, const std::string& idUsuarioAuditor, const std::string& rol);
+	void eliminarUsuario(const std::string& id, const std::string& idUsuarioAuditor);
 };
 
-#endif // GESTOR_USUARIOS_H
+#endif 

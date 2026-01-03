@@ -7,12 +7,12 @@
 
 class GestorAuditoria {
 private:
-    MYSQL* conexionDB;
+	MYSQL* conexionDB;
 
 public:
-    GestorAuditoria(MYSQL* conexion);
-    void registrarAuditoria(const std::string& idUsuario, const std::string& tabla, const std::string& accion, const std::string& descripcion);
-    void listarAuditorias();
+	GestorAuditoria(MYSQL* conexion);
+	void registrarAuditoria(const std::string& idUsuario, const std::string& tabla, const std::string& accion, const std::string& descripcion);
+	void listarAuditorias();
 };
 
-#endif // GESTOR_AUDITORIA_H
+#endif 

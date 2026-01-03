@@ -7,18 +7,18 @@
 
 class GestorCalificaciones {
 private:
-    MYSQL* conexionDB;
+	MYSQL* conexionDB;
 
 public:
-    GestorCalificaciones(MYSQL* conexion);
+	GestorCalificaciones(MYSQL* conexion);
 
-    void registrarCalificacionFinal(const std::string& idExamen, const std::string& idEstudiante, long long mejorIntentoId,
-        const std::string& calificacionFinal, const std::string& puntosObtenidos, const std::string& puntosTotales,
-        const std::string& porcentaje, const std::string& comentarios);
+	void registrarCalificacionFinal(const std::string& idExamen, const std::string& idEstudiante, long long mejorIntentoId,
+		const std::string& calificacionFinal, const std::string& puntosObtenidos, const std::string& puntosTotales,
+		const std::string& porcentaje, const std::string& comentarios);
 
-    // Puedes añadir métodos para listar calificaciones, obtener la mejor calificación de un estudiante, etc.
-    // void listarCalificacionesEstudiante(const std::string& idEstudiante);
-    // void listarCalificacionesExamen(const std::string& idExamen);
+	void obtenerSeguimientoProfesor(const std::string& idProfesor, const std::string& idGrupo);
+
+	void obtenerHistorialAlumno(const std::string& idEstudiante);
 };
 
-#endif // GESTOR_CALIFICACIONES_H
+#endif

@@ -4,21 +4,21 @@
 #include <mysql.h>
 #include <string>
 #include <cgicc/Cgicc.h>
-#include <fstream> // Para manejar archivos
-#include "Utilidades.h" // Se usa Utilidades::sanitizarNombreArchivo
+#include <fstream>
+#include "Utilidades.h"
 
 class GestorRecursos {
 private:
-    MYSQL* conexionDB;
+	MYSQL* conexionDB;
 
 public:
-    GestorRecursos(MYSQL* conexion);
+	GestorRecursos(MYSQL* conexion);
 
-    void listarRecursos();
-    void eliminarRecurso(const std::string& id);
-    void registrarRecurso(const std::string& titulo, const std::string& descripcion, const std::string& categoria,
-        const std::string& tipo, const std::string& autor, const std::string& palabrasClave,
-        const std::string& fecha, const std::string& enlace, cgicc::Cgicc& formulario); // Se pasa formulario para manejar subidas de archivo
+	void listarRecursos();
+	void eliminarRecurso(const std::string& id);
+	void registrarRecurso(const std::string& titulo, const std::string& descripcion, const std::string& categoria,
+		const std::string& tipo, const std::string& autor, const std::string& palabrasClave,
+		const std::string& fecha, const std::string& enlace, cgicc::Cgicc& formulario);
 };
 
 #endif // GESTOR_RECURSOS_H

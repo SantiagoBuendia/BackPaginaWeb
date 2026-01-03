@@ -7,15 +7,16 @@
 
 class GestorGrupos {
 private:
-    MYSQL* conexionDB;
+	MYSQL* conexionDB;
 
 public:
-    GestorGrupos(MYSQL* conexion);
+	GestorGrupos(MYSQL* conexion);
 
-    void registrarGrupo(const std::string& nombre, const std::string& descripcion, const std::string& idProfesor);
-    void registrarEstudianteEnGrupo(const std::string& idGrupo, const std::string& idEstudiante);
-    void listarGrupos(); // Para administradores, listar todos los grupos
-    void listarGruposProfesor(const std::string& idProfesor); // Para profesores, listar sus grupos
+	void registrarGrupo(const std::string& nombre, const std::string& descripcion, const std::string& idProfesor);
+	void registrarEstudianteEnGrupo(const std::string& idGrupo, const std::string& idEstudiante);
+	void listarGrupos();
+	void listarGruposProfesor(const std::string& idProfesor);
+	void listarGruposProfesorJSON(const std::string& idProfesor);
 };
 
-#endif // GESTOR_GRUPOS_H
+#endif 

@@ -5,12 +5,12 @@
 #include <algorithm>
 #include <map>
 #include <ctime>
-#include <cstdlib> // Para rand y srand
-#include <cctype>  // Para isalnum
+#include <cstdlib>
+#include <cctype>
 
 namespace Utilidades {
-    std::string sanitizarNombreArchivo(const std::string& nombreArchivo);
-    std::string generarToken();
+	std::string sanitizarNombreArchivo(const std::string& nombreArchivo);
+	std::string generarToken();
 }
 
-#endif // UTILIDADES_H
+#endif
