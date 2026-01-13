@@ -4,6 +4,12 @@
 #include <cgicc/CgiEnvironment.h>
 #include <string>
 #include <sstream>
+#include <windows.h>
+#include <shellapi.h>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <ctime>
 
 #include "GestorBaseDeDatos.h"
 #include "GestorAuditoria.h"
@@ -13,6 +19,9 @@
 #include "GestorExamenes.h"
 #include "GestorIntentosExamen.h"
 #include "GestorCalificaciones.h"
+#include "GestorSimulacion.h"
+
+void abrirSimuladorAsync(const std::string& idUsuario, const std::string& tipoExp);
 
 int main() {
 	cgicc::Cgicc formulario;
@@ -35,6 +44,7 @@ int main() {
 	GestorExamenes gestorExamenes(conexion);
 	GestorIntentosExamen gestorIntentosExamen(conexion);
 	GestorCalificaciones gestorCalificaciones(conexion);
+	GestorSimulacion gestorSimulacion(conexion);
 
 	std::string idUsuarioAuditor;
 	auto idEntry = formulario.getElement("usuario_id");
@@ -55,7 +65,6 @@ int main() {
 		std::string contrasena = formulario("contrasena");
 		std::string nombre = formulario("nombre");
 		std::string rol = formulario("rol");
-
 		gestorUsuarios.registrarUsuario(correo, contrasena, nombre, rol, idUsuarioAuditor);
 	}
 	else if (accion == "listaru") {
@@ -67,55 +76,26 @@ int main() {
 		std::string nuevaContrasena = formulario("contrasenan");
 		std::string rol = formulario("rol");
 		std::string idUsuarioAuditor = formulario("usuario_id");
-
 		std::string nombreArchivoFinal = "";
 
-		std::cerr << "ID recibido: [" << id << "]" << std::endl;
-
 		const std::vector<cgicc::FormFile>& files = formulario.getFiles();
-		std::cerr << "Cantidad de archivos: " << files.size() << std::endl;
-
-		for (const auto& f : files) {
-			std::cerr << "Archivo encontrado -> campo: " << f.getName()
-				<< " | nombre real: " << f.getFilename()
-				<< " | tamaño: " << f.getData().size()
-				<< std::endl;
-		}
-
 		auto file = formulario.getFile("foto");
 
 		if (file != formulario.getFiles().end() && !file->getFilename().empty()) {
-			std::cerr << "Archivo recibido: " << file->getFilename() << std::endl;
-			std::cerr << "Tamaño archivo: " << file->getData().size() << std::endl;
-
 			std::string nombreOriginal = file->getFilename();
 			std::string extension = "";
-
 			size_t pos = nombreOriginal.find_last_of('.');
 			if (pos != std::string::npos) {
 				extension = nombreOriginal.substr(pos);
 			}
-
 			nombreArchivoFinal = id + extension;
-
-			std::string rutaDestino =
-				"C:\\Apache24\\htdocs\\PaginaWebLaboratorio\\img\\" + nombreArchivoFinal;
-
+			std::string rutaDestino = "C:\\Apache24\\htdocs\\PaginaWebLaboratorio\\img\\" + nombreArchivoFinal;
 			std::ofstream archivoDisco(rutaDestino, std::ios::binary);
-
-			if (!archivoDisco.is_open()) {
-				std::cerr << "ERROR: No se pudo abrir el archivo destino" << std::endl;
-			}
-			else {
+			if (archivoDisco.is_open()) {
 				archivoDisco.write(file->getData().data(), file->getData().size());
 				archivoDisco.close();
-				std::cerr << "Imagen guardada correctamente en: " << rutaDestino << std::endl;
 			}
 		}
-		else {
-			std::cerr << "NO se recibió archivo 'foto'" << std::endl;
-		}
-
 		gestorUsuarios.actualizarUsuario(id, nuevoNombre, nuevaContrasena, idUsuarioAuditor, rol);
 	}
 	else if (accion == "eliminaru") {
@@ -138,7 +118,6 @@ int main() {
 		std::string palabras_clave = formulario("palabras_clave");
 		std::string fecha = formulario("fecha");
 		std::string enlace = formulario("enlace");
-
 		gestorRecursos.registrarRecurso(titulo, descripcion, categoria, tipo, autor, palabras_clave, fecha, enlace, formulario);
 	}
 	else if (accion == "listarAu") {
@@ -267,16 +246,68 @@ int main() {
 		std::string idProfesor = formulario("id");
 		gestorGrupos.listarGruposProfesorJSON(idProfesor);
 	}
-
 	else if (accion == "obtenerSeguimientoProfesor") {
 		std::string idProfesor = formulario("id_profesor");
 		std::string idGrupo = formulario("id_grupo");
-
 		gestorCalificaciones.obtenerSeguimientoProfesor(idProfesor, idGrupo);
 	}
 	else if (accion == "obtenerHistorialAlumno") {
 		std::string idEst = formulario("estudiante_id");
 		gestorCalificaciones.obtenerHistorialAlumno(idEst);
+	}
+	else if (accion == "abrirSimulador") {
+		std::string idUsuario = formulario("usuario_id");
+		std::string tipoExp = formulario("experimento");
+		idUsuario.erase(std::remove(idUsuario.begin(), idUsuario.end(), '\r'), idUsuario.end());
+		idUsuario.erase(std::remove(idUsuario.begin(), idUsuario.end(), '\n'), idUsuario.end());
+		tipoExp.erase(std::remove(tipoExp.begin(), tipoExp.end(), '\r'), tipoExp.end());
+		tipoExp.erase(std::remove(tipoExp.begin(), tipoExp.end(), '\n'), tipoExp.end());
+		abrirSimuladorAsync(idUsuario, tipoExp);
+		std::cout << "Content-type: application/json\r\n\r\n";
+		std::cout << "{\"ok\": true, \"proceso\": \"" << tipoExp << "\"}";
+	}
+	else if (accion == "iniciarSimulacion") {
+		std::string usuarioId = formulario("usuario_id");
+		std::string nombre = formulario("nombre");
+		std::string descripcion = formulario("descripcion");
+		std::string dispositivo = formulario("dispositivo");
+		int idSimulacion = gestorSimulacion.iniciarSimulacion(usuarioId, nombre, descripcion, dispositivo);
+		std::cout << "Content-type: text/plain\r\n\r\n";
+		std::cout << idSimulacion;
+	}
+	else if (accion == "registrarResultado") {
+		gestorSimulacion.registrarResultado(formulario("simulacion_id"), formulario("variable"), formulario("valor"), formulario("unidad"));
+		std::cout << "Content-type: text/plain\r\n\r\nOK";
+	}
+	else if (accion == "registrarEvento") {
+		gestorSimulacion.registrarEvento(formulario("simulacion_id"), formulario("evento"), formulario("detalle"), formulario("tiempo"));
+		std::cout << "Content-type: text/plain\r\n\r\nOK";
+	}
+	else if (accion == "finalizarSimulacion") {
+		gestorSimulacion.finalizarSimulacion(formulario("simulacion_id"), formulario("duracion"));
+		std::cout << "Content-type: text/plain\r\n\r\nOK";
+	}
+	else if (accion == "obtenerSeguimientoCompleto") {
+		std::string filtroNombre = formulario("filtro_nombre");
+		std::string filtroExp = formulario("filtro_exp");
+		filtroNombre.erase(std::remove(filtroNombre.begin(), filtroNombre.end(), '\r'), filtroNombre.end());
+		filtroNombre.erase(std::remove(filtroNombre.begin(), filtroNombre.end(), '\n'), filtroNombre.end());
+		filtroExp.erase(std::remove(filtroExp.begin(), filtroExp.end(), '\r'), filtroExp.end());
+		filtroExp.erase(std::remove(filtroExp.begin(), filtroExp.end(), '\n'), filtroExp.end());
+		gestorSimulacion.obtenerSeguimientoCompleto(filtroNombre, filtroExp);
+	}
+	else if (accion == "obtenerDetallesSimulacion") {
+		std::string idSim = formulario("simulacion_id");
+		gestorSimulacion.obtenerDetallesSimulacion(idSim);
+	}
+	else if (accion == "obtenerSeguimientoEstudiante") {
+		std::string idEstudiante = formulario("estudiante_id");
+		std::string filtroExp = formulario("filtro_exp");
+		idEstudiante.erase(std::remove(idEstudiante.begin(), idEstudiante.end(), '\r'), idEstudiante.end());
+		idEstudiante.erase(std::remove(idEstudiante.begin(), idEstudiante.end(), '\n'), idEstudiante.end());
+		filtroExp.erase(std::remove(filtroExp.begin(), filtroExp.end(), '\r'), filtroExp.end());
+		filtroExp.erase(std::remove(filtroExp.begin(), filtroExp.end(), '\n'), filtroExp.end());
+		gestorSimulacion.obtenerSeguimientoEstudiante(idEstudiante, filtroExp);
 	}
 	else {
 		std::cout << "Content-type: text/html\r\n\r\n";
@@ -285,4 +316,37 @@ int main() {
 	}
 
 	return 0;
+}
+
+void abrirSimuladorAsync(const std::string& idUsuario, const std::string& tipoExp) {
+	std::string tempFilePath = "C:\\Temp\\unity_userid.txt";
+	CreateDirectoryA("C:\\Temp", NULL);
+	std::ofstream tempFile(tempFilePath, std::ios::out | std::ios::trunc);
+	if (tempFile.is_open()) {
+		tempFile << idUsuario;
+		tempFile.close();
+	}
+	Sleep(200);
+	std::string exePath;
+	if (tipoExp == "fusion") {
+		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Fusion\\Ejecutable\\escena_fusion.exe";
+	}
+	else if (tipoExp == "evaporizacion") {
+		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Evaporacion\\Ejecutable\\Laboratorio_Evaporizacion.exe";
+	}
+	else if (tipoExp == "solidificacion") {
+		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Solidificacion\\Ejecutable\\Laboratorio_solidificacion.exe";
+	}
+	else if (tipoExp == "condensacion") {
+		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Condensacion\\Ejecutable\\Laboratorio_Condensacion.exe";
+	}
+	STARTUPINFOA si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+	if (CreateProcessA(exePath.c_str(), NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi)) {
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
 }

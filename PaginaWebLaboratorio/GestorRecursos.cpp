@@ -4,48 +4,40 @@
 GestorRecursos::GestorRecursos(MYSQL* conexion) : conexionDB(conexion) {}
 
 void GestorRecursos::listarRecursos() {
+	mysql_set_character_set(conexionDB, "utf8");
+
 	std::string query = "SELECT * FROM laboratorioquimica.recursos";
 	MYSQL_RES* resultado;
 	MYSQL_ROW fila;
 
-	std::cout << "Content-type: text/html\r\n\r\n";
+	std::cout << "Content-type: text/html; charset=UTF-8\r\n\r\n";
 
 	if (mysql_query(conexionDB, query.c_str()) == 0) {
 		resultado = mysql_store_result(conexionDB);
 
-		std::cout << "<h2 style='text-align:center;'>Biblioteca de Recursos Educativos</h2>";
-		std::cout << "<table id='tabla-recursos-real' border='1' style='width:100%; border-collapse: collapse;'>";
-
-		std::cout << "<thead style='background-color:#003366; color:white;'>";
+		std::cout << "<div id='tabla-recursos-container'>";
+		std::cout << "<table id='tabla-recursos-real'>";
+		std::cout << "<thead>";
 		std::cout << "<tr><th>ID</th><th>Título</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Autor</th><th>Palabras clave</th><th>Fecha</th><th>Enlace</th><th>Acciones</th></tr>";
 		std::cout << "</thead><tbody>";
 
 		while ((fila = mysql_fetch_row(resultado)) != nullptr) {
-			std::string id = fila[0];
+			std::string id = fila[0] ? fila[0] : "0";
 
 			std::cout << "<tr>";
-			std::cout << "<td>" << (fila[0] ? fila[0] : "N/A") << "</td>";
-			std::cout << "<td>" << (fila[1] ? fila[1] : "N/A") << "</td>";
-			std::cout << "<td>" << (fila[2] ? fila[2] : "N/A") << "</td>";
-			std::cout << "<td>" << (fila[3] ? fila[3] : "N/A") << "</td>";
-			std::cout << "<td>" << (fila[4] ? fila[4] : "N/A") << "</td>";
-			std::cout << "<td>" << (fila[5] ? fila[5] : "N/A") << "</td>";
-			std::cout << "<td>" << (fila[6] ? fila[6] : "N/A") << "</td>";
-			std::cout << "<td>" << (fila[7] ? fila[7] : "N/A") << "</td>";
+			for (int i = 0; i < 8; ++i) {
+				std::cout << "<td>" << (fila[i] ? fila[i] : "") << "</td>";
+			}
 			std::cout << "<td><a href='" << (fila[8] ? fila[8] : "#") << "' target='_blank'>Ver recurso</a></td>";
-
 			std::cout << "<td>"
 				<< "<a href='/cgi-bin/PaginaWebLaboratorio.exe?accion=eliminarr&id=" << id
-				<< "' onclick=\"return confirm('¿Estás seguro de eliminar este recurso?');\">"
-				<< "<button style='background-color:#dc3545; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;'>Eliminar</button></a>"
+				<< "' onclick=\"return confirm('¿Estás seguro?');\">"
+				<< "<button class='btn-eliminar'>Eliminar</button></a>"
 				<< "</td>";
 			std::cout << "</tr>";
 		}
-		std::cout << "</tbody></table>";
+		std::cout << "</tbody></table></div>";
 		mysql_free_result(resultado);
-	}
-	else {
-		std::cout << "<p>Error al ejecutar la consulta SQL: " << mysql_error(conexionDB) << "</p>";
 	}
 }
 

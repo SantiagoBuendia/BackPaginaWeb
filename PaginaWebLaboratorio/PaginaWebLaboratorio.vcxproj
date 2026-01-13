@@ -133,6 +133,7 @@
     <ClCompile Include="GestorExamenes.cpp" />
     <ClCompile Include="GestorGrupos.cpp" />
     <ClCompile Include="GestorIntentosExamen.cpp" />
+    <ClCompile Include="GestorSimulacion.cpp" />
     <ClCompile Include="PaginaWebLaboratorio.cpp" />
     <ClCompile Include="GestorRecursos.cpp" />
     <ClCompile Include="GestorUsuarios.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="GestorExamenes.h" />
     <ClInclude Include="GestorGrupos.h" />
     <ClInclude Include="GestorIntentosExamen.h" />
+    <ClInclude Include="GestorSimulacion.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="GestorRecursos.h" />
     <ClInclude Include="GestorUsuarios.h" />
