@@ -319,33 +319,21 @@ int main() {
 }
 
 void abrirSimuladorAsync(const std::string& idUsuario, const std::string& tipoExp) {
-	std::string tempFilePath = "C:\\Temp\\unity_userid.txt";
-	CreateDirectoryA("C:\\Temp", NULL);
-	std::ofstream tempFile(tempFilePath, std::ios::out | std::ios::trunc);
-	if (tempFile.is_open()) {
-		tempFile << idUsuario;
-		tempFile.close();
-	}
-	Sleep(200);
-	std::string exePath;
-	if (tipoExp == "fusion") {
-		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Fusion\\Ejecutable\\escena_fusion.exe";
-	}
-	else if (tipoExp == "evaporizacion") {
-		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Evaporacion\\Ejecutable\\Laboratorio_Evaporizacion.exe";
-	}
-	else if (tipoExp == "solidificacion") {
-		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Solidificacion\\Ejecutable\\Laboratorio_solidificacion.exe";
-	}
-	else if (tipoExp == "condensacion") {
-		exePath = "C:\\Users\\Santiago Buendia\\Documents\\Unity Proyecto de grado\\Condensacion\\Ejecutable\\Laboratorio_Condensacion.exe";
-	}
-	STARTUPINFOA si;
+	std::string tempFile = "C:\\Temp\\unity_userid.txt";
+	std::ofstream f(tempFile, std::ios::out | std::ios::trunc);
+	if (f.is_open()) { f << idUsuario; f.close(); }
+
+	std::string base = "C:\\LaboratorioVR\\";
+	std::string exe;
+
+	if (tipoExp == "fusion")          exe = base + "Fusion_VR\\escena_fusion.exe";
+	else if (tipoExp == "evaporizacion")   exe = base + "Evaporacion\\Laboratorio_Evaporizacion.exe";
+	else if (tipoExp == "solidificacion")  exe = base + "Solidificacion\\Laboratorio_solidificacion.exe";
+	else if (tipoExp == "condensacion")    exe = base + "Condensacion\\Laboratorio_Condensacion.exe";
+
+	STARTUPINFOA si = { sizeof(si) };
 	PROCESS_INFORMATION pi;
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
-	if (CreateProcessA(exePath.c_str(), NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi)) {
+	if (CreateProcessA(exe.c_str(), NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi)) {
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}
