@@ -20,6 +20,7 @@ public:
 	void listarUsuarios();
 	void actualizarUsuario(const std::string& id, const std::string& nuevoNombre, const std::string& nuevaContrasena, const std::string& idUsuarioAuditor, const std::string& rol);
 	void eliminarUsuario(const std::string& id, const std::string& idUsuarioAuditor);
+	void verificarUsuarioVR(const std::string& correo, const std::string& contrasena);
 };
 
 #endif 

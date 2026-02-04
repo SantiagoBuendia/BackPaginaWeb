@@ -309,6 +309,11 @@ int main() {
 		filtroExp.erase(std::remove(filtroExp.begin(), filtroExp.end(), '\n'), filtroExp.end());
 		gestorSimulacion.obtenerSeguimientoEstudiante(idEstudiante, filtroExp);
 	}
+	else if (accion == "verificarVR") {
+		std::string correo = formulario("usuario");
+		std::string contrasena = formulario("contrasena");
+		gestorUsuarios.verificarUsuarioVR(correo, contrasena);
+		}
 	else {
 		std::cout << "Content-type: text/html\r\n\r\n";
 		std::cout << "<html><body><h2>Acción no reconocida.</h2></body></html>";

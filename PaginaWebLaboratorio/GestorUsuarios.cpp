@@ -240,3 +240,29 @@ void GestorUsuarios::eliminarUsuario(const std::string& id, const std::string& i
 		std::cout << "<html><body><h2>Error al eliminar el usuario: " << mysql_error(conexionDB) << "</h2></body></html>";
 	}
 }
+
+void GestorUsuarios::verificarUsuarioVR(const std::string& correo, const std::string& contrasena) {
+	std::string consulta =
+		"SELECT id, usuario, rol FROM usuarios "
+		"WHERE correo='" + correo + "' AND contrasena='" + contrasena + "'";
+
+	mysql_query(conexionDB, consulta.c_str());
+	MYSQL_RES* res = mysql_store_result(conexionDB);
+	MYSQL_ROW row = mysql_fetch_row(res);
+
+	std::cout << "Content-type: application/json\r\n\r\n";
+
+	if (row) {
+		std::cout << "{";
+		std::cout << "\"ok\": true,";
+		std::cout << "\"id\": \"" << row[0] << "\",";
+		std::cout << "\"usuario\": \"" << row[1] << "\",";
+		std::cout << "\"rol\": \"" << row[2] << "\"";
+		std::cout << "}";
+	}
+	else {
+		std::cout << "{ \"ok\": false, \"mensaje\": \"Credenciales inválidas\" }";
+	}
+
+	mysql_free_result(res);
+}
