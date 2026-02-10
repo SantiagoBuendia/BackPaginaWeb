@@ -42,7 +42,7 @@ void GestorUsuarios::verificarUsuario(const std::string& correo, const std::stri
 
 			if (!destino.empty()) {
 				std::cout << "<html><head>";
-				std::cout << "<meta http-equiv='refresh' content='0;URL=http://localhost/PaginaWebLaboratorio/" << destino << "'>";
+				std::cout << "<meta http-equiv='refresh' content='0;URL=/PaginaWebLaboratorio/" << destino << "'>";
 				std::cout << "</head><body></body></html>";
 			}
 			else {
@@ -54,7 +54,7 @@ void GestorUsuarios::verificarUsuario(const std::string& correo, const std::stri
 			std::cout << "<html><head><meta charset='UTF-8'></head><body>";
 			std::cout << "<script type='text/javascript'>";
 			std::cout << "alert('Usuario o contraseña incorrectos. Por favor, intentelo de nuevo.');";
-			std::cout << "window.location.href = 'http://localhost/PaginaWebLaboratorio/index.html';";
+			std::cout << "window.location.href = '/PaginaWebLaboratorio/index.html';";
 			std::cout << "</script>";
 			std::cout << "</body></html>";
 		}
@@ -76,7 +76,7 @@ void GestorUsuarios::registrarUsuario(const std::string& correo, const std::stri
 		gestorAuditoria.registrarAuditoria(idUsuarioAuditor, "usuarios", "INSERT", "Registro el usuario " + nombre + " con rol " + rol);
 		std::cout << "<html><head><script>";
 		std::cout << "alert('✅ Registro exitoso');";
-		std::cout << "window.location.href = 'http://localhost/PaginaWebLaboratorio/gestionUsuarios.html';";
+		std::cout << "window.location.href = '/PaginaWebLaboratorio/gestionUsuarios.html';";
 		std::cout << "</script></head><body></body></html>";
 	}
 	else {
@@ -116,42 +116,37 @@ void GestorUsuarios::listarUsuarios() {
 
 			std::cout << "<tr>";
 			std::cout << "<td>" << id << "</td>";
-			std::cout << "<td>" << usuario << "</td>";
+			std::cout << "<td><strong>" << usuario << "</strong></td>";
 			std::cout << "<td>" << correo << "</td>";
-			std::cout << "<td>" << rol << "</td>";
+			std::cout << "<td><span class='badge-rol rol-" << rol << "'>" << rol << "</span></td>";
 
-			std::cout << "<td>"
-				<< "<a href='http://localhost/PaginaWebLaboratorio/actualizarUsuario.html?id=" << id
-				<< "&nombre=" << usuario
-				<< "&correo=" << correo
-				<< "&rol=" << rol
-				<< "'>"
-				<< "<button>Actualizar</button></a> ";
 
-			std::cout << "<a href='#' onclick=\"return confirmarEliminar(" << id << ")\">"
-				<< "<button>Eliminar</button></a>"
-				<< "</td>";
-			if (rol == "profesor") {
-				std::cout << "<td>"
-					<< "<a href='http://localhost/PaginaWebLaboratorio/asignarCursoP.html?id=" << id
-					<< "&nombre=" << usuario
-					<< "&rol=" << rol
-					<< "'>"
-					<< "<button>Asignar grupo</button></a>"
-					<< "</td>";
-			}
-			else if (rol == "estudiante") {
-				std::cout << "<td>"
-					<< "<a href='http://localhost/PaginaWebLaboratorio/asignarCursoE.html?id=" << id
-					<< "&nombre=" << usuario
-					<< "&rol=" << rol
-					<< "'>"
-					<< "<button>Asignar grupo</button></a>"
-					<< "</td>";
+			std::cout << "<td><div class='action-buttons'>";
+
+
+			std::cout << "<a href='/PaginaWebLaboratorio/actualizarUsuario.html?id=" << id
+				<< "&nombre=" << usuario << "&correo=" << correo << "&rol=" << rol
+				<< "' class='btn-tabla btn-edit' title='Editar Usuario'>"
+				<< "<i class='fas fa-user-edit'></i></a>";
+
+			std::cout << "<a href='#' onclick=\"return confirmarEliminar(" << id << ")\" class='btn-tabla btn-delete' title='Eliminar Usuario'>"
+				<< "<i class='fas fa-trash-alt'></i></a>";
+
+			std::cout << "</div></td>";
+
+			std::cout << "<td>";
+			if (rol == "profesor" || rol == "estudiante") {
+				std::string link = (rol == "profesor") ? "asignarCursoP.html" : "asignarCursoE.html";
+				std::cout << "<a href='/PaginaWebLaboratorio/" << link << "?id=" << id
+					<< "&nombre=" << usuario << "&rol=" << rol
+					<< "' class='btn-tabla btn-assign' title='Asignar Grupo'>"
+					<< "<i class='fas fa-users-cog'></i> <span>Asignar</span></a>";
 			}
 			else {
-				std::cout << "<td>No aplica</td>";
+				std::cout << "<span class='text-muted'>N/A</span>";
 			}
+			std::cout << "</td>";
+
 			std::cout << "</tr>";
 		}
 		std::cout << "</tbody></table>";
@@ -184,18 +179,18 @@ void GestorUsuarios::actualizarUsuario(const std::string& id, const std::string&
 		std::cout << "alert('✅ Actualización exitosa');";
 
 		if (id != idUsuarioAuditor) {
-			std::cout << "window.location.href = 'http://localhost/PaginaWebLaboratorio/gestionUsuarios.html';";
+			std::cout << "window.location.href = '/PaginaWebLaboratorio/gestionUsuarios.html';";
 		}
 		else {
 			std::cout << "const rol = '" << rol << "';";
 			std::cout << "if (rol === 'administrador') {";
-			std::cout << "    window.location.href = 'http://localhost/PaginaWebLaboratorio/administrador.html';";
+			std::cout << "    window.location.href = '/PaginaWebLaboratorio/administrador.html';";
 			std::cout << "} else if (rol === 'profesor') {";
-			std::cout << "    window.location.href = 'http://localhost/PaginaWebLaboratorio/profesor.html';";
+			std::cout << "    window.location.href = '/PaginaWebLaboratorio/profesor.html';";
 			std::cout << "} else if (rol === 'estudiante') {";
-			std::cout << "    window.location.href = 'http://localhost/PaginaWebLaboratorio/estudiante.html';";
+			std::cout << "    window.location.href = '/PaginaWebLaboratorio/estudiante.html';";
 			std::cout << "} else {";
-			std::cout << "    window.location.href = 'http://localhost/PaginaWebLaboratorio/index.html';";
+			std::cout << "    window.location.href = '/PaginaWebLaboratorio/index.html';";
 			std::cout << "}";
 		}
 
@@ -233,7 +228,7 @@ void GestorUsuarios::eliminarUsuario(const std::string& id, const std::string& i
 		std::string descripcion = "Elimino el usuario " + nombreUsuarioEliminado + " con ID " + id;
 		gestorAuditoria.registrarAuditoria(idUsuarioAuditor, "usuarios", "DELETE", descripcion);
 		std::cout << "Status: 302 Found\r\n";
-		std::cout << "Location: http://localhost/PaginaWebLaboratorio/gestionUsuarios.html\r\n\r\n";
+		std::cout << "Location: /PaginaWebLaboratorio/gestionUsuarios.html\r\n\r\n";
 	}
 	else {
 		std::cout << "Content-type: text/html\r\n\r\n";

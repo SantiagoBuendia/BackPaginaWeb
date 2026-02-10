@@ -11,7 +11,7 @@ void GestorGrupos::registrarGrupo(const std::string& nombre, const std::string& 
 	if (mysql_query(conexionDB, query.c_str()) == 0) {
 		std::cout << "<html><head><script>";
 		std::cout << "alert('✅ Grupo registrado exitosamente');";
-		std::cout << "window.location.href = 'http://localhost/PaginaWebLaboratorio/gestionUsuarios.html';";
+		std::cout << "window.location.href = '/PaginaWebLaboratorio/gestionUsuarios.html';";
 		std::cout << "</script></head><body></body></html>";
 	}
 	else {
@@ -30,7 +30,7 @@ void GestorGrupos::registrarEstudianteEnGrupo(const std::string& idGrupo, const 
 	if (mysql_query(conexionDB, query.c_str()) == 0) {
 		std::cout << "<html><head><script>";
 		std::cout << "alert('✅ Estudiante registrado exitosamente en el grupo');";
-		std::cout << "window.location.href = 'http://localhost/PaginaWebLaboratorio/gestionUsuarios.html';";
+		std::cout << "window.location.href = '/PaginaWebLaboratorio/gestionUsuarios.html';";
 		std::cout << "</script></head><body></body></html>";
 	}
 	else {

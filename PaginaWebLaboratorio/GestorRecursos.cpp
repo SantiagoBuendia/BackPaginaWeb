@@ -18,7 +18,7 @@ void GestorRecursos::listarRecursos() {
 		std::cout << "<div id='tabla-recursos-container'>";
 		std::cout << "<table id='tabla-recursos-real'>";
 		std::cout << "<thead>";
-		std::cout << "<tr><th>ID</th><th>Título</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Autor</th><th>Palabras clave</th><th>Fecha</th><th>Enlace</th><th>Acciones</th></tr>";
+		std::cout << "<tr><th>ID</th><th>Titulo</th><th>Descripcion</th><th>Categoria</th><th>Tipo</th><th>Autor</th><th>Palabras clave</th><th>Fecha</th><th>Enlace</th><th>Acciones</th></tr>";
 		std::cout << "</thead><tbody>";
 
 		while ((fila = mysql_fetch_row(resultado)) != nullptr) {
@@ -28,11 +28,16 @@ void GestorRecursos::listarRecursos() {
 			for (int i = 0; i < 8; ++i) {
 				std::cout << "<td>" << (fila[i] ? fila[i] : "") << "</td>";
 			}
-			std::cout << "<td><a href='" << (fila[8] ? fila[8] : "#") << "' target='_blank'>Ver recurso</a></td>";
+			std::cout << "<td>"
+				<< "<a href='" << (fila[8] ? fila[8] : "#") << "' target='_blank' class='btn-ver' title='Ver recurso'>"
+				<< "<i class='fas fa-eye'></i>"
+				<< "</a></td>";
 			std::cout << "<td>"
 				<< "<a href='/cgi-bin/PaginaWebLaboratorio.exe?accion=eliminarr&id=" << id
-				<< "' onclick=\"return confirm('¿Estás seguro?');\">"
-				<< "<button class='btn-eliminar'>Eliminar</button></a>"
+				<< "' onclick=\"return confirm('¿Estás seguro de eliminar este recurso?');\" class='link-no-style'>"
+				<< "<button class='btn-icon-eliminar' title='Eliminar'>"
+				<< "<i class='fas fa-trash-alt'></i>"
+				<< "</button></a>"
 				<< "</td>";
 			std::cout << "</tr>";
 		}
@@ -46,7 +51,7 @@ void GestorRecursos::eliminarRecurso(const std::string& id) {
 
 	if (mysql_query(conexionDB, consulta.c_str()) == 0) {
 		std::cout << "Status: 302 Found\r\n";
-		std::cout << "Location: http://localhost/PaginaWebLaboratorio/contenidoEducativo.html\r\n\r\n";
+		std::cout << "Location: /PaginaWebLaboratorio/contenidoEducativo.html\r\n\r\n";
 	}
 	else {
 		std::cout << "Content-type: text/html\r\n\r\n";
@@ -102,7 +107,7 @@ void GestorRecursos::registrarRecurso(const std::string& titulo, const std::stri
 	if (mysql_query(conexionDB, query.c_str()) == 0) {
 		std::cout << "<html><head><script>";
 		std::cout << "alert('✅ Registro exitoso');";
-		std::cout << "window.location.href = 'http://localhost/PaginaWebLaboratorio/contenidoEducativo.html';";
+		std::cout << "window.location.href = '/PaginaWebLaboratorio/contenidoEducativo.html';";
 		std::cout << "</script></head><body></body></html>";
 	}
 	else {

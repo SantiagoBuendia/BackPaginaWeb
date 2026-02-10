@@ -84,7 +84,11 @@ void GestorExamenes::registrarOpciones(const cgicc::Cgicc& formulario) {
 }
 
 void GestorExamenes::listarExamenesPorProfesor(const std::string& idProfesor) {
-	std::string query = "SELECT id, titulo, descripcion, grupo_id, instrucciones, intentos_permitidos FROM examenes WHERE profesor_id = " + idProfesor;
+	std::string query =
+		"SELECT e.id, e.titulo, e.descripcion, g.nombre, e.instrucciones, e.intentos_permitidos "
+		"FROM examenes e "
+		"JOIN grupos g ON e.grupo_id = g.id " // Unimos las tablas
+		"WHERE e.profesor_id = " + idProfesor;
 	MYSQL_RES* resultado;
 	MYSQL_ROW fila;
 
@@ -97,9 +101,9 @@ void GestorExamenes::listarExamenesPorProfesor(const std::string& idProfesor) {
 			std::cout << "<table class='tabla-moderna'>";
 			std::cout << "<thead><tr>"
 				"<th>ID</th>"
-				"<th>Título</th>"
-				"<th>Descripción</th>"
-				"<th>Grupo ID</th>"
+				"<th>Titulo</th>"
+				"<th>Descripcion</th>"
+				"<th>Grupo</th>"
 				"<th>Intentos</th>"
 				"<th>Acciones</th>"
 				"</tr></thead><tbody>";
@@ -108,7 +112,7 @@ void GestorExamenes::listarExamenesPorProfesor(const std::string& idProfesor) {
 				std::string id = fila[0] ? fila[0] : "";
 				std::string titulo = fila[1] ? fila[1] : "";
 				std::string descripcion = fila[2] ? fila[2] : "";
-				std::string grupo_id = fila[3] ? fila[3] : "";
+				std::string nombre_grupo = fila[3] ? fila[3] : "Sin grupo";
 				std::string instrucciones = fila[4] ? fila[4] : "";
 				std::string intentos_permitidos = fila[5] ? fila[5] : "";
 
@@ -116,7 +120,7 @@ void GestorExamenes::listarExamenesPorProfesor(const std::string& idProfesor) {
 				std::cout << "<td>" << id << "</td>";
 				std::cout << "<td><strong>" << titulo << "</strong></td>";
 				std::cout << "<td>" << descripcion << "</td>";
-				std::cout << "<td>" << grupo_id << "</td>";
+				std::cout << "<td>" << nombre_grupo << "</td>";
 				std::cout << "<td>" << intentos_permitidos << "</td>";
 				std::cout << "<td style='white-space: nowrap;'>";
 
@@ -126,13 +130,13 @@ void GestorExamenes::listarExamenesPorProfesor(const std::string& idProfesor) {
 					<< "<i class='fas fa-edit'></i>"
 					<< "</button></a> ";
 
-				std::cout << "<a href='http://localhost/PaginaWebLaboratorio/agregarPregunta.html?id_examen=" << id
+				std::cout << "<a href='/PaginaWebLaboratorio/agregarPregunta.html?id_examen=" << id
 					<< "' class='link-no-style'>"
 					<< "<button class='btn-accion btn-agregar' title='Agregar Preguntas'>"
 					<< "<i class='fas fa-plus-circle'></i>"
 					<< "</button></a> ";
 
-				std::cout << "<a href='http://localhost/PaginaWebLaboratorio/verExamen.html?id=" << id
+				std::cout << "<a href='/PaginaWebLaboratorio/verExamen.html?id=" << id
 					<< "' class='link-no-style'>"
 					<< "<button class='btn-accion btn-ver' title='Ver Examen'>"
 					<< "<i class='fas fa-eye'></i>"
@@ -179,7 +183,7 @@ void GestorExamenes::eliminarExamen(const std::string& idExamen) {
 
 	if (mysql_query(conexionDB, query.c_str()) == 0) {
 		if (mysql_affected_rows(conexionDB) > 0) {
-			std::cout << "<meta http-equiv='refresh' content='0;url=http://localhost/PaginaWebLaboratorio/gestionEvaluaciones.html'>";
+			std::cout << "<meta http-equiv='refresh' content='0;url=/PaginaWebLaboratorio/gestionEvaluaciones.html'>";
 		}
 		else {
 			std::cout << "<html><body><h3>No se encontró un examen con ese ID.</h3></body></html>";
@@ -356,6 +360,15 @@ void GestorExamenes::formularioEditarExamen(const std::string& idExamen) {
 		".btn-guardar:hover { background-color: #218838; }"
 		".btn-cancelar { background-color: #6c757d; color: white; margin-left: 10px; }"
 		".btn-cancelar:hover { background-color: #5a6268; }"
+
+		"body.modo-oscuro { background-color: #121212; color: #e0e0e0; }"
+		"body.modo-oscuro .card { background-color: #1e1e1e; color: #ffffff; border-top-color: #00aaff; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }"
+		"body.modo-oscuro h2, body.modo-oscuro h4 { color: #00aaff; border-bottom-color: #333; }"
+		"body.modo-oscuro label { color: #bbb; }"
+		"body.modo-oscuro input[type='text'], body.modo-oscuro input[type='number'], body.modo-oscuro textarea {"
+		"  background-color: #2c2c2c; color: white; border-color: #444; }"
+		"body.modo-oscuro .fila-opcion:hover { background-color: #2a2a2a; }"
+
 		"</style>";
 
 	std::cout << "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'>";
@@ -430,8 +443,14 @@ void GestorExamenes::formularioEditarExamen(const std::string& idExamen) {
 
 	std::cout << "<div class='btn-container'>";
 	std::cout << "<button type='submit' class='btn btn-guardar'><i class='fas fa-save'></i> Guardar Cambios</button>";
-	std::cout << "<a href='http://localhost/PaginaWebLaboratorio/gestionEvaluaciones.html' class='btn btn-cancelar'><i class='fas fa-times'></i> Cancelar</a>";
+	std::cout << "<a href='/PaginaWebLaboratorio/gestionEvaluaciones.html' class='btn btn-cancelar'><i class='fas fa-times'></i> Cancelar</a>";
 	std::cout << "</div>";
+
+	std::cout << "<script>"
+		"if (localStorage.getItem('modoOscuro') === 'true') {"
+		"    document.body.classList.add('modo-oscuro');"
+		"}"
+		"</script>";
 
 	std::cout << "</form></div><br><br></body></html>";
 	mysql_free_result(resultado);
@@ -488,7 +507,7 @@ void GestorExamenes::guardarCambiosExamen(const cgicc::Cgicc& formData) {
 		}
 	}
 
-	std::cout << "<script>alert('Examen actualizado exitosamente.'); window.location.href='http://localhost/PaginaWebLaboratorio/gestionEvaluaciones.html';</script>";
+	std::cout << "<script>alert('Examen actualizado exitosamente.'); window.location.href='/PaginaWebLaboratorio/gestionEvaluaciones.html';</script>";
 }
 void GestorExamenes::listarExamenesEstudiante(const std::string& idEstudiante) {
 	std::string query =
